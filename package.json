@@ -1,0 +1,14 @@
+{
+  "name": "xero-api-testing",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:theodiablo/xero-api-testing.git",
+  "author": "Théo Camboulive <theo.camboulive@ecologi.com>",
+  "license": "MIT",
+  "type": "module",
+  "private": true,
+  "dependencies": {
+    "dotenv": "^16.0.0",
+    "xero-node": "^4.19.0"
+  }
+}
