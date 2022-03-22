@@ -1,4 +1,8 @@
-export const getTransactions = async (xeroClient) => {
+import { BankTransaction, XeroClient } from "xero-node";
+
+export const getTransactions = async (
+  xeroClient: XeroClient
+): Promise<BankTransaction[]> => {
   try {
     const lastSyncDate = new Date("2021-03-01");
     const minStartDate = new Date("2022-02-01");
@@ -8,16 +12,17 @@ export const getTransactions = async (xeroClient) => {
 
     const xeroTransactionsResponse =
       await xeroClient.accountingApi.getBankTransactions(
-        "2fd04858-d720-457f-878c-7bb30eff3bef",
+        xeroClient.tenants[0].tenantId,
         lastSyncDate,
         whereFilter,
         "Date ASC"
       );
 
-    return xeroTransactionsResponse.body.bankTransactions;
-  } catch (e) {
+    return xeroTransactionsResponse.body.bankTransactions!;
+  } catch (e: any) {
     console.log(e);
     console.log(e.response.statusCode);
     console.log(e.body);
+    throw e;
   }
 };

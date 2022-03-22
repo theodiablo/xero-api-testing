@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+        "target": "ES2017",
+        "module": "esnext",
+        "strict": true,
+        "forceConsistentCasingInFileNames": true,
+        "outDir": "scripts",
+        "moduleResolution": "Node",
+        "experimentalDecorators": true
+    },
+    "$schema": "https://json.schemastore.org/tsconfig",
+    "exclude": [],
+    "include": [
+        "src/**/*.ts"
+    ]
+}

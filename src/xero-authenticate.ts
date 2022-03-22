@@ -1,21 +1,21 @@
+import * as fs from "fs";
+import * as child_process from "child_process";
 import { XeroClient } from "xero-node";
-import fs from "fs";
-import child_process from "child_process";
 
 const tokenFile = "./tokenSet.json";
 
 export async function buildAndAuthXeroClient() {
   const xeroClient = new XeroClient({
-    clientId: process.env.XERO_CLIENT_ID,
-    clientSecret: process.env.XERO_CLIENT_SECRET,
+    clientId: process.env.XERO_CLIENT_ID!,
+    clientSecret: process.env.XERO_CLIENT_SECRET!,
     redirectUris: [`http://localhost:3000/api/xero/callback`],
-    scopes: process.env.XERO_SCOPES.split(" "),
+    scopes: process.env.XERO_SCOPES!.split(" "),
   });
 
   if (!fs.existsSync(tokenFile)) {
     fs.writeFileSync(tokenFile, "{}");
   }
-  const rawdata = fs.readFileSync(tokenFile);
+  const rawdata: any = fs.readFileSync(tokenFile);
   let tokenSet = JSON.parse(rawdata);
 
   if (!tokenSet || !tokenSet.refresh_token) {
@@ -47,7 +47,10 @@ export async function buildAndAuthXeroClient() {
   return xeroClient;
 }
 
-async function getTokenSetFromRefreshToken(refreshToken, xeroClient) {
+async function getTokenSetFromRefreshToken(
+  refreshToken: string,
+  xeroClient: XeroClient
+) {
   console.log("Update tokens");
   const tokenSet = await xeroClient.refreshWithRefreshToken(
     process.env.XERO_CLIENT_ID,
