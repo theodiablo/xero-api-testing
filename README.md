@@ -1,16 +1,30 @@
 # xero-api-testing
 
+This small typescript project can be used to:
+* Handle OAuth flow to authenticate + refresh token to avoid manually authenticate
+* Playing around with Xero NodeJs API
+* Seed any Xero account with basic data so you have more transactions than the basic ones.
+
+Limitations:
+* At the moment, it only handles 1 account.
+* You'll have to change the redirect URL manually in the code: `http://localhost:3000/api/xero/callback`
+* Not super clean or nicely written. I made this to be quick and dirty
+
+This project is used inside [Ecologi](https://github.com/ecologi/), you are welcome to fork this or contribute if you feel like it could be useful for you.
+
 ## Install
 
-`yarn install`
+Copy the `.env.example` file to `.env` and fill the variables with corresponding values.
+
+Run `yarn install`
 
 ## Usage
 
+To run a script which calls the API:
+`yarn run index`
+
 To fill your Xero account with data:
 `yarn run seed`
-
-To play with the API:
-`yarn run index`
 
 ## Auth
 
