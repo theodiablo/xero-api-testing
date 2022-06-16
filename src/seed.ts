@@ -42,39 +42,43 @@ async function parseInvoices(
     contacts
   );
 
-  const invoices: Invoice[] = data.map((dataLine) => {
-    const invoiceRawData = dataLine.split(",");
+  const invoices: Invoice[] = data
+    .map((dataLine) => {
+      const invoiceRawData = dataLine.split(",");
+      if (invoiceRawData.length > 1) {
+        const date = new Date(invoiceRawData[2]).toISOString();
+        const amount = Number.parseFloat(invoiceRawData[3]);
 
-    const date = new Date(invoiceRawData[2]).toUTCString();
-    const amount = Number.parseFloat(invoiceRawData[3]);
-
-    const newInvoice: Invoice = {
-      type: Invoice.TypeEnum.ACCPAY,
-      status: Invoice.StatusEnum.AUTHORISED,
-      currencyCode: CurrencyCode.GBP,
-      contact: findContactByName(contacts, invoiceRawData[0]),
-      invoiceNumber: invoiceRawData[1],
-      date: date,
-      dueDate: date,
-      fullyPaidOnDate: date,
-      total: amount,
-      lineItems: [
-        {
-          description: invoiceRawData[4],
-          quantity: 1,
-          accountCode: invoiceRawData[5],
-          lineAmount: amount,
-        },
-      ],
-      payments: [
-        {
-          amount: amount,
+        const newInvoice: Invoice = {
+          type: Invoice.TypeEnum.ACCPAY,
+          status: Invoice.StatusEnum.AUTHORISED,
+          currencyCode: CurrencyCode.GBP,
+          contact: findContactByName(contacts, invoiceRawData[0]),
+          invoiceNumber: invoiceRawData[1],
           date: date,
-        },
-      ],
-    };
-    return newInvoice;
-  });
+          dueDate: date,
+          fullyPaidOnDate: date,
+          total: amount,
+          lineItems: [
+            {
+              description: invoiceRawData[4],
+              quantity: 1,
+              accountCode: invoiceRawData[5],
+              lineAmount: amount,
+            },
+          ],
+          payments: [
+            {
+              amount: amount,
+              date: date,
+            },
+          ],
+        };
+        return newInvoice;
+      }
+      return null;
+    })
+    .filter((invoice) => invoice !== null) as Invoice[];
   return invoices;
 }
 
@@ -136,7 +140,7 @@ async function createMissingContacts(
 ) {
   const missingContactNames = contactNames.filter((contactName) => {
     const existingContact = findContactByName(existingContacts, contactName);
-    existingContact === undefined;
+    return existingContact === undefined && contactName.length > 0;
   });
   if (missingContactNames && missingContactNames.length > 0) {
     console.log("Create contacts:", missingContactNames);

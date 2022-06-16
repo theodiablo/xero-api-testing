@@ -6,7 +6,8 @@
         "forceConsistentCasingInFileNames": true,
         "outDir": "scripts",
         "moduleResolution": "Node",
-        "experimentalDecorators": true
+        "experimentalDecorators": true,
+        "sourceMap": true
     },
     "$schema": "https://json.schemastore.org/tsconfig",
     "exclude": [],
