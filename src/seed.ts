@@ -22,25 +22,18 @@ const bankAccount = await getBankAccount(xeroClient);
 
 const transactions = await parseBankTransactions(
   "./seed-data/bank-statements.csv",
-  contacts,
   bankAccount
 );
 await seedTransactions(xeroClient, transactions);
 
-const invoices = await parseInvoices("./seed-data/invoices.csv", contacts);
+const invoices = await parseInvoices("./seed-data/invoices.csv");
 await seedInvoices(xeroClient, invoices, bankAccount);
 
-async function parseInvoices(
-  invoicesFile: string,
-  contacts: Contact[]
-): Promise<Invoice[]> {
+async function parseInvoices(invoicesFile: string): Promise<Invoice[]> {
   var dataFile = fs.readFileSync(invoicesFile, "utf8");
   const data = dataFile.split("\r\n").slice(1);
 
-  await createMissingContacts(
-    data.map((dataLine) => dataLine.split(",")[0]),
-    contacts
-  );
+  await createMissingContacts(data.map((dataLine) => dataLine.split(",")[0]));
 
   const invoices: Invoice[] = data
     .map((dataLine) => {
@@ -53,7 +46,7 @@ async function parseInvoices(
           type: Invoice.TypeEnum.ACCPAY,
           status: Invoice.StatusEnum.AUTHORISED,
           currencyCode: CurrencyCode.GBP,
-          contact: findContactByName(contacts, invoiceRawData[0]),
+          contact: findContactByName(invoiceRawData[0]),
           invoiceNumber: invoiceRawData[1],
           date: date,
           dueDate: date,
@@ -84,23 +77,19 @@ async function parseInvoices(
 
 async function parseBankTransactions(
   bankTransactionsFile: string,
-  contacts: Contact[],
   bankAccount: Account
 ): Promise<BankTransaction[]> {
   var dataFile = fs.readFileSync(bankTransactionsFile, "utf8");
   const data = dataFile.split("\r\n").slice(1);
 
-  await createMissingContacts(
-    data.map((dataLine) => dataLine.split(",")[0]),
-    contacts
-  );
+  await createMissingContacts(data.map((dataLine) => dataLine.split(",")[0]));
 
   const bankTransactions: BankTransaction[] = data.map((dataLine) => {
     const transactionRawData = dataLine.split(",");
     const newTransaction: BankTransaction = {
       date: new Date(transactionRawData[1]).toISOString(),
       total: Number.parseFloat(transactionRawData[2]),
-      contact: findContactByName(contacts, transactionRawData[0]),
+      contact: findContactByName(transactionRawData[0]),
       reference: transactionRawData[3],
       type: BankTransaction.TypeEnum.SPEND,
       status: BankTransaction.StatusEnum.AUTHORISED,
@@ -123,31 +112,32 @@ async function parseBankTransactions(
   return bankTransactions;
 }
 
-function findContactByName(
-  contacts: Contact[],
-  contactName: string
-): Contact | undefined {
+function findContactByName(contactName: string): Contact | undefined {
   const contact = contacts.find((contact) => contact.name === contactName);
   if (contact) {
-    return {
-      contactID: contact.contactID,
-    };
+    return contact;
+  } else {
+    console.log(`Could not find contact ${contactName}`);
+    return undefined;
   }
 }
-async function createMissingContacts(
-  contactNames: string[],
-  existingContacts: Contact[]
-) {
+async function createMissingContacts(contactNames: string[]) {
   const missingContactNames = contactNames.filter((contactName) => {
-    const existingContact = findContactByName(existingContacts, contactName);
+    const existingContact = findContactByName(contactName);
     return existingContact === undefined && contactName.length > 0;
   });
   if (missingContactNames && missingContactNames.length > 0) {
-    console.log("Create contacts:", missingContactNames);
-    const createdContacts = await createContacts(
-      xeroClient,
-      missingContactNames
-    );
-    existingContacts.push(...createdContacts);
+    const batchedArrays: Array<Array<string>> = [];
+    const batchSize = 25;
+    for (let i = 0, len = missingContactNames.length; i < len; i += batchSize) {
+      batchedArrays.push(missingContactNames.slice(i, i + batchSize));
+    }
+
+    for (const contactNames of batchedArrays) {
+      console.log("Create contacts:", contactNames);
+      const createdContacts = await createContacts(xeroClient, contactNames);
+      contacts.push(...createdContacts);
+    }
+    console.log("Contacts created");
   }
 }
