@@ -9,7 +9,7 @@
   "private": true,
   "exports": "./src/index.js",
   "scripts": {
-    "authCallback": "node --loader ts-node/esm src/authCallback.ts",
+    "auth": "node --loader ts-node/esm src/auth.ts",
     "index": "node --loader ts-node/esm src/index.ts",
     "seed": "node --loader ts-node/esm src/seed.ts"
   },

@@ -2,7 +2,6 @@
 
 This small typescript project can be used to:
 * Handle OAuth flow to authenticate + refresh token to avoid manually authenticate
-* Playing around with Xero NodeJs API
 * Seed any Xero account with basic data so you have more transactions than the basic ones.
 
 Limitations:
@@ -20,11 +19,10 @@ Run `yarn install`
 
 ## Usage
 
-To run a script which calls the API:
-`yarn run index`
-
 To fill your Xero account with data:
-`yarn run seed`
+`yarn run seed [amount]`
+
+* `amount`: Number of transactions and invoices to be created. Optional, default 50
 
 ## Auth
 
@@ -32,6 +30,6 @@ When you first run any script, if you are not authenticated, it will redirect yo
 
 The url should be something like `http://localhost:3000/api/xero/callback?code=8a3e....`
 
-`yarn run authCallback CALLBACK_URL`
+`yarn run auth CALLBACK_URL`
 
-This will create the file `tokenSet.json` where it will keep the credentials and use them to refresh the token
+This will create the file `tokenSet.json` where it will keep the credentials and use them to refresh the token, then you can run again the `yarn seed` function
