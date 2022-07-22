@@ -20,7 +20,7 @@ Run `yarn install`
 ## Usage
 
 To fill your Xero account with data:
-`yarn run seed [amount]`
+`yarn seed [amount]`
 
 * `amount`: Number of transactions and invoices to be created. Optional, default 50
 
@@ -30,6 +30,6 @@ When you first run any script, if you are not authenticated, it will redirect yo
 
 The url should be something like `http://localhost:3000/api/xero/callback?code=8a3e....`
 
-`yarn run auth CALLBACK_URL`
+`yarn auth CALLBACK_URL`
 
 This will create the file `tokenSet.json` where it will keep the credentials and use them to refresh the token, then you can run again the `yarn seed` function
