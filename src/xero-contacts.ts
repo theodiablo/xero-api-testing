@@ -7,8 +7,12 @@ export class XeroContact {
   constructor(private readonly xeroClient: XeroClient) {}
 
   public async init(contactNames: string[]): Promise<void> {
-    this.contacts = await this.loadXeroContacts(contactNames);
+    this.contacts = await this.loadXeroContacts();
     await this.createMissingContacts(contactNames);
+
+    this.contacts = this.contacts.filter((contact) => {
+      return contactNames.includes(`${contact.name}`);
+    })
   }
 
   public getRandomContact(): Contact {
@@ -32,12 +36,10 @@ export class XeroContact {
     }
   }
 
-  private async loadXeroContacts(contactNames: string[]): Promise<Contact[]> {
+  private async loadXeroContacts(): Promise<Contact[]> {
     try {
       const contactsResponse = await this.xeroClient.accountingApi.getContacts(
-        this.xeroClient.tenants[0].tenantId,
-        undefined,
-        contactNames.map((name) => `Name=="${name}"`).join("||")
+        this.xeroClient.tenants[0].tenantId
       );
 
       return contactsResponse.body.contacts!;
