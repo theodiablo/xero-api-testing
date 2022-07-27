@@ -71,7 +71,7 @@ async function generateBankTransactions(): Promise<BankTransaction[]> {
       date: randomDate().toISOString(),
       total: amount,
       contact: xeroContact.getRandomContact(),
-      reference: randomString(10),
+      reference: randomString(30),
       type: BankTransaction.TypeEnum.SPEND,
       status: BankTransaction.StatusEnum.AUTHORISED,
       isReconciled: true,

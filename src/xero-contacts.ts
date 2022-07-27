@@ -7,7 +7,7 @@ export class XeroContact {
   constructor(private readonly xeroClient: XeroClient) {}
 
   public async init(contactNames: string[]): Promise<void> {
-    this.contacts = await this.loadXeroContacts();
+    this.contacts = await this.loadXeroContacts(contactNames);
     await this.createMissingContacts(contactNames);
   }
 
@@ -32,10 +32,12 @@ export class XeroContact {
     }
   }
 
-  private async loadXeroContacts(): Promise<Contact[]> {
+  private async loadXeroContacts(contactNames: string[]): Promise<Contact[]> {
     try {
       const contactsResponse = await this.xeroClient.accountingApi.getContacts(
-        this.xeroClient.tenants[0].tenantId
+        this.xeroClient.tenants[0].tenantId,
+        undefined,
+        contactNames.map((name) => `Name=="${name}"`).join("||")
       );
 
       return contactsResponse.body.contacts!;

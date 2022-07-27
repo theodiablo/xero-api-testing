@@ -26,6 +26,7 @@ export const createInvoices = async (
             account,
             amount: invoice.amountDue,
             date: invoice.date,
+            isReconciled: true,
           })),
         }
       );
