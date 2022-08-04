@@ -1,25 +1,33 @@
 import { BankTransaction, XeroClient } from "xero-node";
+import { XERO_CONCURRENT_REQUESTS } from "./constants.js";
+import { chunk } from "./utils.js";
 
 export const createTransactions = async (
   xeroClient: XeroClient,
   bankTransactions: BankTransaction[]
 ): Promise<BankTransaction[]> => {
   try {
-    const transactionsResult = [];
-    // Split transactions into batches of 100 to avoid rate limiting
-    for (let i = 0; i < bankTransactions.length; i += 100) {
-      const xeroTransactionsResponse =
-        await xeroClient.accountingApi.createBankTransactions(
-          xeroClient.tenants[0].tenantId,
-          {
-            bankTransactions: bankTransactions.slice(i, i + 100),
-          }
-        );
-      const createdTransactions =
-        xeroTransactionsResponse.body.bankTransactions || [];
-      transactionsResult.push(...createdTransactions);
-      console.log(
-        `Created ${transactionsResult.length}/${bankTransactions.length} transactions`
+    const transactionsResult: BankTransaction[] = [];
+
+    // Split transactions into batches of 100 and run them concurrently in Xero
+    const transactionsBatches = chunk(bankTransactions, 100);
+
+    while (transactionsBatches.length > 0) {
+      const currentBatches = transactionsBatches.splice(
+        0,
+        XERO_CONCURRENT_REQUESTS
+      );
+      await Promise.all(
+        currentBatches.map((batch) =>
+          createTransactionsInternal(xeroClient, batch).then(
+            (createdTransactions) => {
+              transactionsResult.push(...createdTransactions);
+              console.log(
+                `Created ${transactionsResult.length}/${bankTransactions.length} transactions`
+              );
+            }
+          )
+        )
       );
     }
 
@@ -30,6 +38,20 @@ export const createTransactions = async (
     console.log(e.response.body.Elements.map((el: any) => el.ValidationErrors));
     throw e;
   }
+};
+
+const createTransactionsInternal = async (
+  xeroClient: XeroClient,
+  bankTransactions: BankTransaction[]
+) => {
+  const xeroTransactionsResponse =
+    await xeroClient.accountingApi.createBankTransactions(
+      xeroClient.tenants[0].tenantId,
+      {
+        bankTransactions,
+      }
+    );
+  return xeroTransactionsResponse.body.bankTransactions || [];
 };
 
 export const getTransactions = async (

@@ -1,4 +1,6 @@
 import { Account, Invoice, XeroClient } from "xero-node";
+import { XERO_CONCURRENT_REQUESTS } from "./constants.js";
+import { chunk } from "./utils.js";
 
 export const createInvoices = async (
   xeroClient: XeroClient,
@@ -7,32 +9,25 @@ export const createInvoices = async (
 ): Promise<Invoice[]> => {
   try {
     const invoicessResult: Invoice[] = [];
-    // Split invoices into batches of 100 to avoid rate limiting
-    for (let i = 0; i < invoices.length; i += 100) {
-      const xeroInvoicesResponse =
-        await xeroClient.accountingApi.createInvoices(
-          xeroClient.tenants[0].tenantId,
-          {
-            invoices: invoices.slice(i, i + 100),
-          }
-        );
-      const createdInvoices = xeroInvoicesResponse.body.invoices || [];
-      // Pay invoices
-      await xeroClient.accountingApi.createPayments(
-        xeroClient.tenants[0].tenantId,
-        {
-          payments: createdInvoices!.map((invoice) => ({
-            invoice,
-            account,
-            amount: invoice.amountDue,
-            date: invoice.date,
-            isReconciled: true,
-          })),
-        }
+    // Split invoices into batches of 100 and run them concurrently in Xero
+    const invoicesBatches = chunk(invoices, 100);
+
+    while (invoicesBatches.length > 0) {
+      const currentBatches = invoicesBatches.splice(
+        0,
+        XERO_CONCURRENT_REQUESTS
       );
-      invoicessResult.push(...createdInvoices);
-      console.log(
-        `Created ${invoicessResult.length}/${invoices.length} invoices`
+      await Promise.all(
+        currentBatches.map((batch) =>
+          createInvoicesInternal(xeroClient, batch, account).then(
+            (createdInvoices) => {
+              invoicessResult.push(...createdInvoices);
+              console.log(
+                `Created ${invoicessResult.length}/${invoices.length} invoices`
+              );
+            }
+          )
+        )
       );
     }
 
@@ -43,6 +38,34 @@ export const createInvoices = async (
     console.log(e.response.body.Elements.map((el: any) => el.ValidationErrors));
     throw e;
   }
+};
+
+const createInvoicesInternal = async (
+  xeroClient: XeroClient,
+  invoices: Invoice[],
+  account: Account
+) => {
+  const xeroInvoicesResponse = await xeroClient.accountingApi.createInvoices(
+    xeroClient.tenants[0].tenantId,
+    {
+      invoices,
+    }
+  );
+  const createdInvoices = xeroInvoicesResponse.body.invoices || [];
+  // Pay invoices
+  await xeroClient.accountingApi.createPayments(
+    xeroClient.tenants[0].tenantId,
+    {
+      payments: createdInvoices!.map((invoice) => ({
+        invoice,
+        account,
+        amount: invoice.amountDue,
+        date: invoice.date,
+        isReconciled: true,
+      })),
+    }
+  );
+  return createdInvoices;
 };
 
 export const getInvoices = async (
