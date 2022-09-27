@@ -69,7 +69,7 @@ export class XeroContact {
     });
     if (missingContactNames && missingContactNames.length > 0) {
       const batchedArrays: Array<Array<string>> = [];
-      const batchSize = 25;
+      const batchSize = 100;
       for (
         let i = 0, len = missingContactNames.length;
         i < len;
