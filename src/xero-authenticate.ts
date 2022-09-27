@@ -8,7 +8,7 @@ export async function buildAndAuthXeroClient() {
   const xeroClient = new XeroClient({
     clientId: process.env.XERO_CLIENT_ID!,
     clientSecret: process.env.XERO_CLIENT_SECRET!,
-    redirectUris: [`http://localhost:3000/api/xero/callback`],
+    redirectUris: [`http://localhost:3001/api/xero/callback`],
     scopes: process.env.XERO_SCOPES!.split(" "),
   });
 
@@ -20,7 +20,7 @@ export async function buildAndAuthXeroClient() {
 
   if (!tokenSet || !tokenSet.refresh_token) {
     console.log("No token set created");
-    const url = `https://login.xero.com/identity/connect/authorize?response_type=code&client_id=${process.env.XERO_CLIENT_ID}&redirect_uri=http://localhost:3000/api/xero/callback&scope=${process.env.XERO_SCOPES}`;
+    const url = `https://login.xero.com/identity/connect/authorize?response_type=code&client_id=${process.env.XERO_CLIENT_ID}&redirect_uri=http://localhost:3001/api/xero/callback&scope=${process.env.XERO_SCOPES}`;
 
     await child_process.exec(
       process.platform.replace("darwin", "").replace(/win32|linux/, "xdg-") +

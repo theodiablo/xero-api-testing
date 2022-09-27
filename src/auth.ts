@@ -12,7 +12,7 @@ dotenv.config();
 const xeroClient = new XeroClient({
   clientId: process.env.XERO_CLIENT_ID!,
   clientSecret: process.env.XERO_CLIENT_SECRET!,
-  redirectUris: [`http://localhost:3000/api/xero/callback`],
+  redirectUris: [`http://localhost:3001/api/xero/callback`],
   scopes: process.env.XERO_SCOPES!.split(" "),
 });
 

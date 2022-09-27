@@ -6,7 +6,7 @@ This small typescript project can be used to:
 
 Limitations:
 * At the moment, it only handles 1 account.
-* You'll have to change the redirect URL manually in the code: `http://localhost:3000/api/xero/callback`
+* You'll have to change the redirect URL manually in the code: `http://localhost:3001/api/xero/callback`
 * Not super clean or nicely written. I made this to be quick and dirty
 
 This project is used inside [Ecologi](https://github.com/ecologi/), you are welcome to fork this or contribute if you feel like it could be useful for you.
@@ -28,7 +28,7 @@ To fill your Xero account with data:
 
 When you first run any script, if you are not authenticated, it will redirect you the xero auth page, when you complete the authorization flow, then run the following script pasting the url you have been redirected to.
 
-The url should be something like `http://localhost:3000/api/xero/callback?code=8a3e....`
+The url should be something like `http://localhost:3001/api/xero/callback?code=8a3e....`
 
 `yarn auth CALLBACK_URL`
 

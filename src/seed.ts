@@ -24,7 +24,7 @@ const bankAccount = await getBankAccount(xeroClient);
 const accountCodes = await getAccountCodes(xeroClient);
 
 await generateBankTransactions();
-await generateInvoices();
+//await generateInvoices();
 
 async function generateInvoices(): Promise<Invoice[]> {
   const invoices: Invoice[] = [];
@@ -71,7 +71,7 @@ async function generateBankTransactions(): Promise<BankTransaction[]> {
       date: randomDate().toISOString(),
       total: amount,
       contact: xeroContact.getRandomContact(),
-      reference: randomString(30),
+      reference: randomString(256),
       type: BankTransaction.TypeEnum.SPEND,
       status: BankTransaction.StatusEnum.AUTHORISED,
       isReconciled: true,
