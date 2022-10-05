@@ -12,7 +12,7 @@ export class XeroContact {
 
     this.contacts = this.contacts.filter((contact) => {
       return contactNames.includes(`${contact.name}`);
-    })
+    });
   }
 
   public getRandomContact(): Contact {
@@ -24,16 +24,10 @@ export class XeroContact {
     return this.contacts;
   }
 
-  private findContactByName(contactName: string): Contact | undefined {
-    const contact = this.contacts.find(
-      (contact) => contact.name === contactName
+  private contactExists(contactName: string): boolean {
+    return this.contacts.some(
+      (contact) => contact.name?.toLowerCase() === contactName.toLowerCase()
     );
-    if (contact) {
-      return contact;
-    } else {
-      console.log(`Could not find contact ${contactName}`);
-      return undefined;
-    }
   }
 
   private async loadXeroContacts(): Promise<Contact[]> {
@@ -49,25 +43,31 @@ export class XeroContact {
   }
 
   private async createContacts(contactNames: string[]): Promise<Contact[]> {
-    const createContactResponse =
-      await this.xeroClient.accountingApi.createContacts(
-        this.xeroClient.tenants[0].tenantId,
-        {
-          contacts: contactNames.map((contactName) => ({
-            name: contactName,
-          })),
-        }
-      );
+    try {
+      const createContactResponse =
+        await this.xeroClient.accountingApi.createContacts(
+          this.xeroClient.tenants[0].tenantId,
+          {
+            contacts: contactNames.map((contactName) => ({
+              name: contactName,
+            })),
+          }
+        );
 
-    return createContactResponse.body.contacts!;
+      return createContactResponse.body.contacts!;
+    } catch (error) {
+      console.error("Error creating contacts", error);
+      throw error;
+    }
   }
 
   private async createMissingContacts(contactNames: string[]): Promise<void> {
-    const missingContactNames = contactNames.filter((contactName) => {
-      const existingContact = this.findContactByName(contactName);
-      return existingContact === undefined && contactName.length > 0;
-    });
+    const missingContactNames = contactNames.filter(
+      (contactName) =>
+        contactName.length > 0 && !this.contactExists(contactName)
+    );
     if (missingContactNames && missingContactNames.length > 0) {
+      console.debug("Missing contacts", missingContactNames);
       const batchedArrays: Array<Array<string>> = [];
       const batchSize = 100;
       for (
@@ -79,11 +79,11 @@ export class XeroContact {
       }
 
       for (const contactNames of batchedArrays) {
-        console.log("Create contacts:", contactNames);
+        console.debug("Create contacts:", contactNames);
         const createdContacts = await this.createContacts(contactNames);
         this.contacts.push(...createdContacts);
       }
-      console.log("Contacts created");
+      console.debug("Contacts created");
     }
   }
 }
