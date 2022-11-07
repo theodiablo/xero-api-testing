@@ -21,7 +21,12 @@ const xeroContact = new XeroContact(xeroClient);
 await xeroContact.init(contactNames);
 
 const bankAccount = await getBankAccount(xeroClient);
-const accountCodes = await getAccountCodes(xeroClient);
+const accountCodes = await getAccountCodes(xeroClient, [
+  "DIRECTCOSTS",
+  "EXPENSE",
+  "FIXED",
+  "OVERHEADS",
+]);
 
 await generateBankTransactions();
 await generateInvoices();

@@ -19,15 +19,14 @@ export const getBankAccount = async (
   }
 };
 export const getAccountCodes = async (
-  xeroClient: XeroClient
+  xeroClient: XeroClient,
+  accountTypes?: string[]
 ): Promise<Account[]> => {
-  const SPEND_ACCOUNT_TYPES = ["DIRECTCOSTS", "FIXED", "OVERHEADS"];
-
   try {
     const contactsResponse = await xeroClient.accountingApi.getAccounts(
       xeroClient.tenants[0].tenantId,
       undefined,
-      SPEND_ACCOUNT_TYPES.map((type) => `TYPE=="${type}"`).join("||")
+      accountTypes && accountTypes.map((type) => `TYPE=="${type}"`).join("||")
     );
 
     return contactsResponse.body.accounts || [];
