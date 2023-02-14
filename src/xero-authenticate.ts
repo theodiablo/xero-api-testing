@@ -27,7 +27,7 @@ export async function buildAndAuthXeroClient() {
         `open "${url}"`
     );
     throw new Error(
-      `No tokenSet found. Please run 'node authCallback <callbackUrl>' See README.md for more info.`
+      `No tokenSet found. Please run 'yarn auth <callbackUrl>' See README.md for more info.`
     );
   }
 

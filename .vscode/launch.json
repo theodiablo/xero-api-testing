@@ -12,6 +12,14 @@
       "args": ["${input:number}"],
       "preLaunchTask": "tsc: build - tsconfig.json",
       "outFiles": ["${workspaceFolder}/scripts/**/*.js"]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Index",
+      "program": "${workspaceFolder}/src/index.ts",
+      "preLaunchTask": "tsc: build - tsconfig.json",
+      "outFiles": ["${workspaceFolder}/scripts/**/*.js"]
     }
   ],
   "inputs": [
