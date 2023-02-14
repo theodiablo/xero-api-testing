@@ -697,10 +697,10 @@ wrappy@1:
   resolved "https://registry.yarnpkg.com/wrappy/-/wrappy-1.0.2.tgz#b5243d8f3ec1aa35f1364605bc0d1036e30ab69f"
   integrity sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==
 
-xero-node@^4.28.0:
-  version "4.28.0"
-  resolved "https://registry.yarnpkg.com/xero-node/-/xero-node-4.28.0.tgz#a5b9cc50fab3d17f0db6df164b17befd3cc382f3"
-  integrity sha512-ZHAqrza/USWliU/q1ubUfLaVNEy9hh7PZRR8nRWRRLEZJaDwVyO7+JffLg+xHDjXKkfG7qGOITM7kjEy07WdVA==
+xero-node@^4.32.0:
+  version "4.32.0"
+  resolved "https://registry.yarnpkg.com/xero-node/-/xero-node-4.32.0.tgz#49d0f8ba24180a61a7689b98010f8da39c8abaa1"
+  integrity sha512-8oSECGnIlb0jMsOF1dVBDs13PAN+yrLx8YVB4b/7PfJzGCT1oSSZNsjNGX7IxphqrLo/nY3zLkKKOo/QIAjM/g==
   dependencies:
     openid-client "^4.9.1"
     request "^2.88.0"
