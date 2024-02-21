@@ -23,13 +23,14 @@ export const getAccountCodes = async (
   accountTypes?: string[]
 ): Promise<Account[]> => {
   try {
-    const contactsResponse = await xeroClient.accountingApi.getAccounts(
+    const accountCodesResponse = await xeroClient.accountingApi.getAccounts(
       xeroClient.tenants[0].tenantId,
       undefined,
       accountTypes && accountTypes.map((type) => `TYPE=="${type}"`).join("||")
     );
-
-    return contactsResponse.body.accounts || [];
+    return (accountCodesResponse.body.accounts || []).filter(
+      (accountCode) => accountCode.taxType !== "NONE"
+    );
   } catch (e: any) {
     console.log(e);
     console.log(e.response.statusCode);

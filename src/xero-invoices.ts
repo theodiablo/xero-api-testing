@@ -33,7 +33,6 @@ export const createInvoices = async (
 
     return invoicessResult;
   } catch (e: any) {
-    console.log(e.body);
     console.log(e.response.body);
     console.log(e.response.body.Elements.map((el: any) => el.ValidationErrors));
     throw e;

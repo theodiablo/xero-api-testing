@@ -37,6 +37,7 @@ async function generateInvoices(): Promise<Invoice[]> {
   for (let i = 0; i < amount; i++) {
     const amount = Math.random() * 1000 + 10;
     const invoiceDate = randomDate().toISOString();
+    const accountCode = accountCodes[randomInt(0, accountCodes.length - 1)];
     invoices.push({
       type: Invoice.TypeEnum.ACCPAY,
       status: Invoice.StatusEnum.AUTHORISED,
@@ -51,8 +52,9 @@ async function generateInvoices(): Promise<Invoice[]> {
         {
           description: randomString(20),
           quantity: 1,
-          accountCode: accountCodes[randomInt(0, accountCodes.length - 1)].code,
           lineAmount: amount,
+          accountCode: accountCode.code,
+          taxType: accountCode.taxType,
         },
       ],
       payments: [
@@ -72,6 +74,7 @@ async function generateBankTransactions(): Promise<BankTransaction[]> {
 
   for (let i = 0; i < amount; i++) {
     const amount = Math.random() * 1000 + 10;
+    const accountCode = accountCodes[randomInt(0, accountCodes.length - 1)];
     transactions.push({
       date: randomDate().toISOString(),
       total: amount,
@@ -84,7 +87,8 @@ async function generateBankTransactions(): Promise<BankTransaction[]> {
         {
           quantity: 1.0,
           unitAmount: amount,
-          accountCode: accountCodes[randomInt(0, accountCodes.length - 1)].code,
+          accountCode: accountCode.code,
+          taxType: accountCode.taxType,
         },
       ],
       bankAccount: {
