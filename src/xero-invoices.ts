@@ -7,36 +7,27 @@ export const createInvoices = async (
   invoices: Invoice[],
   account: Account
 ): Promise<Invoice[]> => {
-  try {
-    const invoicessResult: Invoice[] = [];
-    // Split invoices into batches of 100 and run them concurrently in Xero
-    const invoicesBatches = chunk(invoices, 100);
+  const invoicessResult: Invoice[] = [];
+  // Split invoices into batches of 100 and run them concurrently in Xero
+  const invoicesBatches = chunk(invoices, 100);
 
-    while (invoicesBatches.length > 0) {
-      const currentBatches = invoicesBatches.splice(
-        0,
-        XERO_CONCURRENT_REQUESTS
-      );
-      await Promise.all(
-        currentBatches.map((batch) =>
-          createInvoicesInternal(xeroClient, batch, account).then(
-            (createdInvoices) => {
-              invoicessResult.push(...createdInvoices);
-              console.log(
-                `Created ${invoicessResult.length}/${invoices.length} invoices`
-              );
-            }
-          )
+  while (invoicesBatches.length > 0) {
+    const currentBatches = invoicesBatches.splice(0, XERO_CONCURRENT_REQUESTS);
+    await Promise.all(
+      currentBatches.map((batch) =>
+        createInvoicesInternal(xeroClient, batch, account).then(
+          (createdInvoices) => {
+            invoicessResult.push(...createdInvoices);
+            console.log(
+              `Created ${invoicessResult.length}/${invoices.length} invoices`
+            );
+          }
         )
-      );
-    }
-
-    return invoicessResult;
-  } catch (e: any) {
-    console.log(e.response.body);
-    console.log(e.response.body.Elements.map((el: any) => el.ValidationErrors));
-    throw e;
+      )
+    );
   }
+
+  return invoicessResult;
 };
 
 const createInvoicesInternal = async (

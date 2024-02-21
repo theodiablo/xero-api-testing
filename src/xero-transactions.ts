@@ -6,38 +6,31 @@ export const createTransactions = async (
   xeroClient: XeroClient,
   bankTransactions: BankTransaction[]
 ): Promise<BankTransaction[]> => {
-  try {
-    const transactionsResult: BankTransaction[] = [];
+  const transactionsResult: BankTransaction[] = [];
 
-    // Split transactions into batches of 100 and run them concurrently in Xero
-    const transactionsBatches = chunk(bankTransactions, 100);
+  // Split transactions into batches of 100 and run them concurrently in Xero
+  const transactionsBatches = chunk(bankTransactions, 100);
 
-    while (transactionsBatches.length > 0) {
-      const currentBatches = transactionsBatches.splice(
-        0,
-        XERO_CONCURRENT_REQUESTS
-      );
-      await Promise.all(
-        currentBatches.map((batch) =>
-          createTransactionsInternal(xeroClient, batch).then(
-            (createdTransactions) => {
-              transactionsResult.push(...createdTransactions);
-              console.log(
-                `Created ${transactionsResult.length}/${bankTransactions.length} transactions`
-              );
-            }
-          )
+  while (transactionsBatches.length > 0) {
+    const currentBatches = transactionsBatches.splice(
+      0,
+      XERO_CONCURRENT_REQUESTS
+    );
+    await Promise.all(
+      currentBatches.map((batch) =>
+        createTransactionsInternal(xeroClient, batch).then(
+          (createdTransactions) => {
+            transactionsResult.push(...createdTransactions);
+            console.log(
+              `Created ${transactionsResult.length}/${bankTransactions.length} transactions`
+            );
+          }
         )
-      );
-    }
-
-    return transactionsResult;
-  } catch (e: any) {
-    console.log(e);
-    console.log(e.body);
-    console.log(e.body.Elements.map((el: any) => el.ValidationErrors));
-    throw e;
+      )
+    );
   }
+
+  return transactionsResult;
 };
 
 const createTransactionsInternal = async (
